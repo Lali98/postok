@@ -6,20 +6,25 @@
 // https://jsonplaceholder.typicode.com/posts
 
 document.getElementById('fetch-posts').onclick = function () {
+    sentRequest('GET', 'https://jsonplaceholder.typicode.com/posts', null, function (posts) {
+        let postListHTML = '';
+        for (let post of posts) {
+            postListHTML += '<p>' + post.title + '</p><small>' + post.body + '</small>';
+        }
+
+        document.getElementById('post-list-contner').innerHTML = postListHTML;
+    });
+};
+
+function sentRequest(method, url, body, callback) {
     let xhr = new XMLHttpRequest;
 
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            let posts = JSON.parse(xhr.responseText);
-
-            let podtListHTML = '';
-            for(let post of posts) {
-                podtListHTML += '<p>' + post.title + '</p><small>' + post.body +  '</small>';
-            }
-            
-            document.getElementById('post-list-contner').innerHTML = podtListHTML;
+            callback(JSON.parse(xhr.responseText));
         }
     };
-    xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts');
-    xhr.send();
-};
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhr.open(method, url);
+    xhr.send(body);
+}
